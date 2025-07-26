@@ -1,6 +1,5 @@
 package com.example.myplacesapp
 
-
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
@@ -25,7 +24,6 @@ fun MyPlacesMapScreen(viewModel: MyPlacesViewModel) {
     var location by remember { mutableStateOf<LatLng?>(null) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
-    // Permissão de localização
     val locationPermissionGranted = remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
@@ -44,7 +42,6 @@ fun MyPlacesMapScreen(viewModel: MyPlacesViewModel) {
         }
     }
 
-    // Solicita permissão na primeira execução
     LaunchedEffect(Unit) {
         if (!locationPermissionGranted.value) {
             launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -71,18 +68,15 @@ fun MyPlacesMapScreen(viewModel: MyPlacesViewModel) {
                 properties = MapProperties(isMyLocationEnabled = locationPermissionGranted.value),
                 uiSettings = MapUiSettings(myLocationButtonEnabled = true),
                 onMapLongClick = { latLng ->
-                    // Exemplo: Adicione um lugar sem dialog (direto)
                     viewModel.addPlace(MyPlace("Lugar ${viewModel.myPlaces.size + 1}", latLng))
                 }
             ) {
-                // (Opcional) Marcador para o local atual
                 location?.let {
                     Marker(
                         state = MarkerState(position = it),
                         title = "Você está aqui"
                     )
                 }
-                // Marcadores adicionados pelo usuário
                 for (place in viewModel.myPlaces) {
                     Marker(
                         state = MarkerState(position = place.latLng),
@@ -95,7 +89,6 @@ fun MyPlacesMapScreen(viewModel: MyPlacesViewModel) {
 
                     )
                 }
-                // Desenhar Polyline entre os dois selecionados
                 if (viewModel.selectedPlaces.size == 2) {
                     Polyline(
                         points = listOf(
